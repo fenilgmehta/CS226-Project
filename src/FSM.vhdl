@@ -297,40 +297,66 @@ process(r,clk,instruction,init_carry,init_zero,T1,T2,T3,fsm_state_symbol)
 					done_var := '1';
 	
 	when s16 =>
-		rf_w_var := '0';
-		t2_w_var := '0';
-		m30_var := '0';
-		m31_var := '0';
-		m50_var := '0';
-		m51_var := '0';	
-		m70_var := '1';
-		m71_var := '0';
+		t3_w_var = '1';
+		t2_w_var = '1';
+		nextState_var = s17;
+		-- rf_w_var := '0';
+		-- t2_w_var := '0';
+		-- m30_var := '0';
+		-- m31_var := '0';
+		-- m50_var := '0';
+		-- m51_var := '0';	
+		-- m70_var := '1';
+		-- m71_var := '0';
 
-		if (instruction(15 downto 12) = "1000" ) then
-			nextState_var := s15;
-		else
-		-- opcode : 1001
-			nextState_var := s18;
-		end if;
+		-- if (instruction(15 downto 12) = "1000" ) then
+		-- 	nextState_var := s15;
+		-- else
+		-- -- opcode : 1001
+		-- 	nextState_var := s18;
+		-- end if;
 	
 	when s17 =>
-		pc_w_var := '0';
-		m90_var := '1';
-		m91_var := '0';
-		m100_var := '1';
-		m101_var := '0';
-		m1_var := '0';
+		m_w_var = '1';
+		t1_w_var = '1';
+		if (T2(2 downto 0) /= "000") then  -- t19
+			nextState_var = s16;
+		else  -- t20
+			nextState_var = s4;
+		end if;
+		-- pc_w_var := '0';
+		-- m90_var := '1';
+		-- m91_var := '0';
+		-- m100_var := '1';
+		-- m101_var := '0';
+		-- m1_var := '0';
 
-		nextState_var := s0;
-		done_var := '1';
+		-- nextState_var := s0;
+		-- done_var := '1';
 					
 	when s18 =>
-		pc_w_var := '0';
-		m1_var := '1';
+		rf_w_var = '1';
+		t2_w_var = '1';
+		if (instruction(15 downto 12) == "1000") then
+			nextState_var = s19;
+		else
+			nextState_var = s20;
+		end if;
+		-- pc_w_var := '0';
+		-- m1_var := '1';
 
-		nextState_var := s0;
-		done_var := '1';
-				 
+		-- nextState_var := s0;
+		-- done_var := '1';
+				
+	when s19 =>
+		alu_var = '0';
+		pc_w_var = '1';
+		nextState_var = s0;
+
+	when s20 =>
+		pc_w_var = '1';
+		nextState_var = s0;
+
 	when sa =>
 		pc_w_var := '0';				 
 		m90_var := '1';
