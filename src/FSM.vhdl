@@ -7,7 +7,8 @@ ENTITY FSM IS
 		r, clk, init_carry, init_zero : IN STD_LOGIC;
 		pc_w, m_w, ir_w, rf_w, t3_w, t2_w, t1_w,
 		m1, m20, m21, m30, m31, m4, m50, m51, m60, m61, m70, m71, m8, m90, m91, m100, m101, mux,
-		carry, zero, done, alucont, m12 : OUT STD_LOGIC);
+		carry, zero, done, alucont, m12 : OUT STD_LOGIC
+    );
 END ENTITY;
 
 ARCHITECTURE Behave4 OF FSM IS
