@@ -9,10 +9,10 @@ library ieee ;
 entity generic_adder is
     generic(n: natural :=16);
     port (
-            input_a : in std_logic_vector (n-1 downto 0);
-            input_b : in std_logic_vector (n-1 downto 0);
-            output_sum : out std_logic_vector (n-1 downto 0);
-            carry : out std_logic
+        input_a : in std_logic_vector (n-1 downto 0);
+        input_b : in std_logic_vector (n-1 downto 0);
+        output_sum : out std_logic_vector (n-1 downto 0);
+        carry : out std_logic
     ) ;
 end generic_adder ; 
 
@@ -23,7 +23,7 @@ architecture generic_adder_arch of generic_adder is
 
 begin
     temp_n_bit_result <= input_a + input_b;
-    output_sum <= temp_n_bit_result(n-1 downto 0)
+    output_sum <= temp_n_bit_result(n-1 downto 0);
     carry <= temp_n_bit_result(n);
 
-end generic_adder_arch ;
+end generic_adder_arch;
