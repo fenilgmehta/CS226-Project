@@ -2,6 +2,8 @@
 
 
 ### References
+- https://www.seas.upenn.edu/~ese171/vhdl/vhdl_primer.html
+- https://www.ics.uci.edu/~jmoorkan/vhdlref/vhdl.html
 - https://ghdl.readthedocs.io/en/stable/using/QuickStartGuide.html
 - https://ghdl.readthedocs.io/en/latest/using/InvokingGHDL.html?highlight=synopsys#cmdoption-ghdl-fsynopsys
 - https://youtu.be/lMw0ps1iTz0 - How to install and use GHDL on Ubuntu
