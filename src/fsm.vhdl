@@ -5,14 +5,17 @@ ENTITY FSM IS
 	PORT (
 		instruction, T1, T2, T3, mem : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
 		r, clk, init_carry, init_zero : IN STD_LOGIC;
+
 		pc_w, m_w, ir_w, rf_w, t3_w, t2_w, t1_w,
-		mux_pc, mux_mem_addr_A, mux_mem_addr_B, mux_mem_in, mux_rf_d3_A, mux_rf_d3_B, mux_rf_a1, mux_rf_a3_A, mux_rf_a3_B, mux_t1, mux_t2_A, mux_t2_B, mux_alu_a_A, mux_alu_a_B, mux_alu_b_A, mux_alu_b_B, mux_t3_A, mux_t3_B,
-		-- m1, m20, m21, m30, m31, m4, m50, m51, m60, m61, m70, m71, m8, m90, m91, m100, m101, mux,
-		carry, zero, done, alucont, m12 : OUT STD_LOGIC
+		mux_pc, mux_mem_addr_A, mux_mem_addr_B, mux_mem_in, mux_rf_d3_A, mux_rf_d3_B, mux_rf_a1, mux_rf_a3_A,
+		mux_rf_a3_B, mux_t1, mux_t2_A, mux_t2_B, mux_alu_a_A, mux_alu_a_B, mux_alu_b_A, mux_alu_b_B, mux_t3_A, mux_t3_B,
+		alu_operation : OUT STD_LOGIC;
+		flag_alu_cz_update: OUT STD_LOGIC;  -- used for state S2
+		flag_mem_z_update: OUT STD_LOGIC  -- used for state S8
 	);
 END ENTITY;
 
-ARCHITECTURE Behave4 OF FSM IS
+ARCHITECTURE FSM_arch OF FSM IS
 
 	TYPE StateSymbol IS (s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, s16, s17, s18, s19, s20, s21, sa);
 	SIGNAL fsm_state_symbol : StateSymbol;
@@ -21,8 +24,14 @@ BEGIN
 	PROCESS (r, clk, instruction, init_carry, init_zero, T1, T2, T3, fsm_state_symbol)
 		VARIABLE nextState_var : StateSymbol;
 		VARIABLE pc_w_var, m_w_var, ir_w_var, rf_w_var, t3_w_var, t2_w_var, t1_w_var,
-		m1_var, m20_var, m21_var, m30_var, m31_var, m4_var, m50_var, m51_var, m60_var, m61_var, m70_var, m71_var, m8_var, m90_var, m91_var, m100_var, m101_var,
-		carry_var, zero_var, mux_var, done_var, alu_var, m12_var : STD_LOGIC;
+		  		done_var, alu_var : STD_LOGIC;
+
+		VARIABLE mux_pc_var, mux_mem_addr_A_var, mux_mem_addr_B_var, mux_mem_in_var, mux_rf_d3_A_var,
+		        mux_rf_d3_B_var, mux_rf_a1_var, mux_rf_a3_A_var, mux_rf_a3_B_var, mux_t1_var, mux_t2_A_var,
+				mux_t2_B_var, mux_alu_a_A_var, mux_alu_a_B_var, mux_alu_b_A_var, mux_alu_b_B_var,
+				mux_t3_A_var, mux_t3_B_var : STD_LOGIC;
+
+		VARIABLE flag_alu_cz_update_var, flag_mem_z_update_var : STD_LOGIC;
 
 	BEGIN
 		nextState_var := fsm_state_symbol;
@@ -53,6 +62,9 @@ BEGIN
 		mux_t3_A_var := '0';
 		mux_t3_B_var := '0';
 
+		flag_alu_cz_update_var := '0';
+		flag_mem_z_update_var := '0';
+
 		CASE fsm_state_symbol IS
 			WHEN s0 =>
 				ir_w_var := '1';
@@ -82,7 +94,7 @@ BEGIN
 				mux_t2_B_var := '1';
 
 
-				IF (instruction(15 DOWNTO 12) = "0100") OR (mem(15 DOWNTO 12) = "0101")) THEN --t8
+				IF ((instruction(15 DOWNTO 12) = "0100") OR (mem(15 DOWNTO 12) = "0101")) THEN --t8
 					nextState_var := s7;
 				ELSIF (((instruction(15 DOWNTO 12) = "0000") OR (instruction(15 DOWNTO 12) = "0010")) AND ((instruction(1 DOWNTO 0) = "00") OR (instruction(1 DOWNTO 0) = "10" AND init_carry = '1') OR (instruction(1 DOWNTO 0) = "01" AND init_zero = '1'))) THEN --t10
 					nextState_var := s2;
@@ -92,7 +104,7 @@ BEGIN
 					nextState_var := s4;
 				END IF;
 
-			WHEN s2 => -- TODO: To be refined
+			WHEN s2 =>
 				t3_w_var := '1';
 
 				mux_alu_a_A_var := '0';
@@ -102,15 +114,13 @@ BEGIN
 				mux_t3_A_var := '0';
 				mux_t3_B_var := '1';
 
-				IF ((instruction(15 DOWNTO 12) = "0000") OR (instruction(15 DOWNTO 12) = "0001")) THEN
-					carry_var := '0';
-				END IF;
-				zero_var := '0';
 				IF (instruction(15 DOWNTO 12) = "0010") THEN
 					alu_var := '1';
 				ELSE
 					alu_var := '0';
 				END IF;
+
+				flag_alu_cz_update_var := '1';
 
 				IF ((instruction(15 DOWNTO 12) = "0000") OR (instruction(15 DOWNTO 12) = "0010")) THEN --t11
 					nextState_var := s3;
@@ -179,7 +189,7 @@ BEGIN
 					nextState_var := s10;
 				END IF;
 
-			WHEN s8 =>  -- TODO: To be refined
+			WHEN s8 =>
 				t3_w_var := '1';
 				
 				mux_mem_addr_A_var := '0';
@@ -187,11 +197,7 @@ BEGIN
 				mux_t3_A_var := '0';
 				mux_t3_B_var := '0';
 
-				IF (T3 = 0) THEN
-					zero_var := '1';
-				ELSE
-					zero_var := '0';
-				END IF;
+				flag_mem_z_update_var := '1';
 
 				nextState_var := s9;
 
@@ -376,6 +382,8 @@ BEGIN
 		t2_w <= t2_w_var;
 		t1_w <= t1_w_var;
 
+		alu_operation <= alu_var;
+
 		mux_pc <= mux_pc_var;
 		mux_mem_addr_A <= mux_mem_addr_A_var;
 		mux_mem_addr_B <= mux_mem_addr_B_var;
@@ -395,30 +403,9 @@ BEGIN
 		mux_t3_A <= mux_t3_A_var;
 		mux_t3_B <= mux_t3_B_var;
 
-		-- m1 <= m1_var;
-		-- m20 <= m20_var;
-		-- m21 <= m21_var;
-		-- m30 <= m30_var;
-		-- m31 <= m31_var;
-		-- m4 <= m4_var;
-		-- m50 <= m50_var;
-		-- m51 <= m51_var;
-		-- m60 <= m60_var;
-		-- m61 <= m61_var;
-		-- m70 <= m70_var;
-		-- m71 <= m71_var;
-		-- m8 <= m8_var;
-		-- m90 <= m90_var;
-		-- m91 <= m91_var;
-		-- m100 <= m100_var;
-		-- m101 <= m101_var;
-		-- carry <= carry_var;
-		-- zero <= zero_var;
-		-- mux <= mux_var;
-		-- done <= done_var;
-		-- alucont <= alu_var;
-		-- m12 <= m12_var;
-		-- q(k+1) = nq(k)
+		flag_alu_cz_update <= flag_alu_cz_update_var;
+		flag_mem_z_update <= flag_mem_z_update_var;
+
 		IF (rising_edge(clk)) THEN
 			IF (r = '1') THEN
 				fsm_state_symbol <= s0;
@@ -429,4 +416,4 @@ BEGIN
 
 	END PROCESS;
 
-END Behave4;
+END FSM_arch;
