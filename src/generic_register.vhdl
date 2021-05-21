@@ -9,7 +9,6 @@ entity generic_register is
         input_reg: in std_logic_vector(n-1 downto 0);
         clock: in std_logic;
         load_reg: in std_logic;
-        clear_reg: in std_logic;
         output_reg: out std_logic_vector(n-1 downto 0)
     );
 end generic_register;
@@ -21,11 +20,9 @@ architecture generic_register_arch of generic_register is
 
 begin
 
-    process(input_reg, clock, load_reg, clear_reg)
+    process(input_reg, clock, load_reg)
     begin
-        if clear_reg = '0' then
-            output_reg_temp <= (output_reg_temp'range => '0');
-        elsif (clock = '1' and clock'event) then
+        if (clock = '1' and clock'event) then  -- positive edge trigger
             if load_reg = '1' then
                 output_reg_temp <= input_reg;
             end if;
