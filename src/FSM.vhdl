@@ -6,9 +6,10 @@ ENTITY FSM IS
 		instruction, T1, T2, T3, mem : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
 		r, clk, init_carry, init_zero : IN STD_LOGIC;
 		pc_w, m_w, ir_w, rf_w, t3_w, t2_w, t1_w,
-		m1, m20, m21, m30, m31, m4, m50, m51, m60, m61, m70, m71, m8, m90, m91, m100, m101, mux,
+		mux_pc, mux_mem_addr_A, mux_mem_addr_B, mux_mem_in, mux_rf_d3_A, mux_rf_d3_B, mux_rf_a1, mux_rf_a3_A, mux_rf_a3_B, mux_t1, mux_t2_A, mux_t2_B, mux_alu_a_A, mux_alu_a_B, mux_alu_b_A, mux_alu_b_B, mux_t3_A, mux_t3_B,
+		-- m1, m20, m21, m30, m31, m4, m50, m51, m60, m61, m70, m71, m8, m90, m91, m100, m101, mux,
 		carry, zero, done, alucont, m12 : OUT STD_LOGIC
-    );
+	);
 END ENTITY;
 
 ARCHITECTURE Behave4 OF FSM IS
@@ -33,29 +34,48 @@ BEGIN
 		t2_w_var := '0';
 		t1_w_var := '0';
 
-		m1_var := '0';
-		m20_var := '1';
-		m21_var := '0';
-		m30_var := '0';
-		m31_var := '0';
-		m4_var := '0';
-		m50_var := '0';
-		m51_var := '0';
-		m60_var := '0';
-		m61_var := '0';
-		m70_var := '0';
-		m71_var := '0';
-		m8_var := '0';
-		m90_var := '0';
-		m91_var := '0';
-		m100_var := '0';
-		m101_var := '0';
-		carry_var := '1';
-		zero_var := '1';
-		mux_var := '0';
-		done_var := '0';
-		alu_var := '0';
-		m12_var := '0';
+		mux_pc_var := '0';
+		mux_mem_addr_A_var := '0';
+		mux_mem_addr_B_var := '0';
+		mux_mem_in_var := '0';
+		mux_rf_d3_A_var := '0';
+		mux_rf_d3_B_var := '0';
+		mux_rf_a1_var := '0';
+		mux_rf_a3_A_var := '0';
+		mux_rf_a3_B_var := '0';
+		mux_t1_var := '0';
+		mux_t2_A_var := '0';
+		mux_t2_B_var := '0';
+		mux_alu_a_A_var := '0';
+		mux_alu_a_B_var := '0';
+		mux_alu_b_A_var := '0';
+		mux_alu_b_B_var := '0';
+		mux_t3_A_var := '0';
+		mux_t3_B_var := '0';
+
+		-- m1_var := '0';
+		-- m20_var := '1';
+		-- m21_var := '0';
+		-- m30_var := '0';
+		-- m31_var := '0';
+		-- m4_var := '0';
+		-- m50_var := '0';
+		-- m51_var := '0';
+		-- m60_var := '0';
+		-- m61_var := '0';
+		-- m70_var := '0';
+		-- m71_var := '0';
+		-- m8_var := '0';
+		-- m90_var := '0';
+		-- m91_var := '0';
+		-- m100_var := '0';
+		-- m101_var := '0';
+		-- carry_var := '1';
+		-- zero_var := '1';
+		-- mux_var := '0';
+		-- done_var := '0';
+		-- alu_var := '0';
+		-- m12_var := '0';
 		-- compute next-state, output
 		CASE fsm_state_symbol IS
 			WHEN s0 =>
