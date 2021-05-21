@@ -1,10 +1,11 @@
 library ieee ;
-    use ieee.std_logic_1164.all ;
-    use ieee.numeric_std.all ;
-    use ieee.std_logic_arith.all; 
-    -- for performing arithmetic directly.
+use ieee.std_logic_1164.all ;
+use ieee.std_logic_arith.all; 
+use ieee.std_logic_unsigned.all;
+use ieee.numeric_std.all ;
 
-
+-- REFER: http://esd.cs.ucr.edu/labs/tutorial/adder.vhd
+-- For performing arithmetic directly
 
 entity generic_adder is
     generic(n: natural :=16);
@@ -17,13 +18,10 @@ entity generic_adder is
 end generic_adder ; 
 
 architecture generic_adder_arch of generic_adder is
-
     signal temp_n_bit_result : std_logic_vector(n downto 0);
-    -- storing result in n bit and will use the nth bit as carry.
-
+    -- Storing result in n bit and will use the nth bit as carry
 begin
-    temp_n_bit_result <= input_a + input_b;
+    temp_n_bit_result <= ('0' & input_a) + ('0' & input_b);
     output_sum <= temp_n_bit_result(n-1 downto 0);
     carry <= temp_n_bit_result(n);
-
 end generic_adder_arch;
