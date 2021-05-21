@@ -2,6 +2,8 @@
 
 
 ### References
+- https://ghdl.readthedocs.io/en/stable/using/QuickStartGuide.html
+- https://ghdl.readthedocs.io/en/latest/using/InvokingGHDL.html?highlight=synopsys#cmdoption-ghdl-fsynopsys
 - https://youtu.be/lMw0ps1iTz0 - How to install and use GHDL on Ubuntu
     ```sh
     sudo apt install gnat checkinstall
@@ -19,6 +21,7 @@
 
     ghdl -e filename_tb
 
+    ghdl -s --ieee=synopsys -fexplicit filename.vhdl
     ```
 - https://askubuntu.com/a/1278739 - Use `checkinstall` to easily uninstall packages installed from source
     - https://medium.com/swlh/how-to-remove-a-package-installed-from-source-code-on-ubuntu-wsl2-dce36cc8086a#:~:text=sudo%20apt-get%20install%20checkinstall

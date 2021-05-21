@@ -1,16 +1,16 @@
-library ieee ;
+library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 
 
 entity generic_register is
-
-generic(n: natural :=16);
-port(	input_reg:	in std_logic_vector(n-1 downto 0);
-        clock:	in std_logic;
-        load_reg:	in std_logic;
-        clear_reg:	in std_logic;
-        output_reg:	out std_logic_vector(n-1 downto 0)
+    generic(n: natural :=16);
+    port(	
+        input_reg: in std_logic_vector(n-1 downto 0);
+        clock: in std_logic;
+        load_reg: in std_logic;
+        clear_reg: in std_logic;
+        output_reg: out std_logic_vector(n-1 downto 0)
     );
 end generic_register;
 
@@ -23,16 +23,13 @@ begin
 
     process(input_reg, clock, load_reg, clear_reg)
     begin
-
-	if clear_reg = '0' then
-            
+        if clear_reg = '0' then
             output_reg_temp <= (output_reg_temp'range => '0');
-	elsif (clock='1' and clock'event) then
-	    if load_reg = '1' then
-            output_reg_temp <= input_reg;
-	    end if;
-	end if;
-
+        elsif (clock = '1' and clock'event) then
+            if load_reg = '1' then
+                output_reg_temp <= input_reg;
+            end if;
+        end if;
     end process;
 
     output_reg <= output_reg_temp;
