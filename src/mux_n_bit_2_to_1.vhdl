@@ -21,7 +21,7 @@ begin
         case s0 is
             when '0' => O <= i0;
             when '1' => O <= i1;
-            when others => O <= (others => '0');  -- unused
+            when others => O <= (others => 'Z');  -- unused
         end case;
     end process;
 
