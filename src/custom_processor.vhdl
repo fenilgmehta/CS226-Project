@@ -194,16 +194,16 @@ begin
         O => s_T1_in
     );
 
-    process (in_clock)
-    begin
-        temp_sign_extender_6 := (others => s_instruction_register(5));
-        temp_sign_extender_6(5 downto 0) := s_instruction_register(5 downto 0);
-        l_mux_t2: mux_n_bit_4_to_1 generic map (n => 16) port map (
-            i0 => temp_sign_extender_6, i1 => s_rf_D2_out, i2 => s_alu_C, i3 => 0,
-            s0 => c_mux_t2_A, s1 => c_mux_t2_B,
-            O => s_T2_in
-        );
-    end process;
+    temp_sign_extender_6 <= (others => s_instruction_register(5));
+    temp_sign_extender_6(5 downto 0) <= s_instruction_register(5 downto 0);
+    temp_sign_extender_9 <= (others => s_instruction_register(8));
+    temp_sign_extender_9(8 downto 0) <= s_instruction_register(8 downto 0);
+
+    l_mux_t2: mux_n_bit_4_to_1 generic map (n => 16) port map (
+        i0 => temp_sign_extender_6, i1 => s_rf_D2_out, i2 => s_alu_C, i3 => 0,
+        s0 => c_mux_t2_A, s1 => c_mux_t2_B,
+        O => s_T2_in
+    );
     
     l_t1: generic_register generic map (n => 16) port map (
         input_reg => s_T1_in, clock => in_clock, load_reg => c_t1_w, output_reg => s_T1_out
@@ -218,18 +218,11 @@ begin
         O => s_alu_a_in
     );
 
-    process (in_clock)
-    begin
-        temp_sign_extender_6 := (others => s_instruction_register(5));
-        temp_sign_extender_6(5 downto 0) := s_instruction_register(5 downto 0);
-        temp_sign_extender_9 := (others => s_instruction_register(8));
-        temp_sign_extender_9(8 downto 0) := s_instruction_register(8 downto 0);
-        l_mux_ALU_A: mux_n_bit_4_to_1 generic map (n => 16) port map (
-            i0 => 1, i1 => s_T2_out, i2 => temp_sign_extender_6, i3 => temp_sign_extender_9,
-            s0 => c_mux_alu_b_A, s1 => c_mux_alu_b_B,
-            O => s_alu_b_in
-        );
-    end process;
+    l_mux_ALU_A: mux_n_bit_4_to_1 generic map (n => 16) port map (
+        i0 => 1, i1 => s_T2_out, i2 => temp_sign_extender_6, i3 => temp_sign_extender_9,
+        s0 => c_mux_alu_b_A, s1 => c_mux_alu_b_B,
+        O => s_alu_b_in
+    );
 
     process (in_clock, c_flag_alu_cz_update, c_alu_operation)
     begin
