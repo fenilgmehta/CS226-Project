@@ -1,5 +1,36 @@
 # CS226-Project
 
+### Execution Steps
+```sh
+function ghdl_compile() {
+    local FILE_NAME="${1}"
+    ghdl -s --ieee=synopsys -fexplicit ${FILE_NAME}
+    ghdl -a --ieee=synopsys -fexplicit ${FILE_NAME}
+    ghdl -c --ieee=synopsys -fexplicit ${FILE_NAME}
+}
+
+ghdl_compile register_file.vhdl
+ghdl_compile mux_n_bit_2_to_1.vhdl
+ghdl_compile mux_n_bit_4_to_1.vhdl
+ghdl_compile memory.vhdl
+ghdl_compile generic_register.vhdl
+ghdl_compile generic_nand.vhdl
+ghdl_compile generic_alu.vhdl
+ghdl_compile generic_adder.vhdl
+ghdl_compile fsm.vhdl
+ghdl_compile custom_processor.vhdl
+ghdl_compile custom_processor_TestBench.vhdl
+ghdl -e --ieee=synopsys -fexplicit customprocessor_tb  # This will execute the test bench
+
+# ---
+
+ghdl -s --ieee=synopsys -fexplicit *.vhdl
+ghdl -a --ieee=synopsys -fexplicit custom_processor*
+ghdl -c --ieee=synopsys -fexplicit custom_processor*
+ghdl -e --ieee=synopsys -fexplicit customprocessor_tb  # This will execute the test bench
+ghdl -r --ieee=synopsys -fexplicit customprocessor_tb  # This will execute the test bench
+```
+
 ### References
 
 - https://www.seas.upenn.edu/~ese171/vhdl/vhdl_primer.html
