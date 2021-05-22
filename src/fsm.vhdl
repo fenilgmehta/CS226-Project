@@ -3,10 +3,10 @@ USE ieee.std_logic_1164.ALL;
 
 ENTITY FSM IS
     PORT (
-        instruction, T1, T2, T3, mem : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-        r, clk, init_carry, init_zero : IN STD_LOGIC;
+        instruction, T1, T2, T3 : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+        clock, reset, init_carry, init_zero : IN STD_LOGIC;
 
-        pc_w, m_w, ir_w, rf_w, t3_w, t2_w, t1_w,
+        pc_w, m_w, ir_w, rf_w, t3_w, t2_w, t1_w,  -- Program Counter write, Memory Write, Instruction Register Write, Register File Write, Register T1 & T2 & T3 Write
         mux_pc, mux_mem_addr_A, mux_mem_addr_B, mux_mem_in, mux_rf_d3_A, mux_rf_d3_B, mux_rf_a1, mux_rf_a3_A,
         mux_rf_a3_B, mux_t1, mux_t2_A, mux_t2_B, mux_alu_a_A, mux_alu_a_B, mux_alu_b_A, mux_alu_b_B, mux_t3_A, mux_t3_B,
         alu_operation : OUT STD_LOGIC;
@@ -21,8 +21,9 @@ ARCHITECTURE FSM_arch OF FSM IS
     SIGNAL fsm_state_symbol : StateSymbol;
 
 BEGIN
-    PROCESS (r, clk, instruction, init_carry, init_zero, T1, T2, T3, fsm_state_symbol)
+    PROCESS (reset, clock, instruction, init_carry, init_zero, T1, T2, T3, fsm_state_symbol)
         VARIABLE nextState_var : StateSymbol;
+        
         VARIABLE pc_w_var, m_w_var, ir_w_var, rf_w_var, t3_w_var, t2_w_var, t1_w_var,
                  done_var, alu_var : STD_LOGIC;
 
@@ -406,8 +407,8 @@ BEGIN
         flag_alu_cz_update <= flag_alu_cz_update_var;
         flag_mem_z_update <= flag_mem_z_update_var;
 
-        IF (rising_edge(clk)) THEN
-            IF (r = '1') THEN
+        IF (rising_edge(clock)) THEN
+            IF (reset = '1') THEN
                 fsm_state_symbol <= s0;
             ELSE
                 fsm_state_symbol <= nextState_var;
