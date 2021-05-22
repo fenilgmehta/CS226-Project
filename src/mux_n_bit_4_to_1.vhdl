@@ -25,7 +25,7 @@ begin
             when "01" => O <= i1;
             when "10" => O <= i2;
             when "11" => O <= i3;
-            when others => O <= (others => 'X');
+            when others => O <= (others => '0');  -- unused
         end case;
     end process;
 

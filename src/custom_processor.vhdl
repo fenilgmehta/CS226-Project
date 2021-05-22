@@ -135,7 +135,7 @@ begin
     -- -- REFER: https://www.intel.com/content/www/us/en/programmable/support/support-resources/knowledge-base/solutions/rd03312005_587.html
     -- s_mux_select_line <= (c_mux_mem_addr_A & c_mux_mem_addr_B);
     l_mux_memory_addr: mux_n_bit_4_to_1 generic map (n => 16) port map (
-        i0 => s_T2_out, i1 => s_PC_out, i2 => s_T1_out, i3 => (others => 'X'),
+        i0 => s_T2_out, i1 => s_PC_out, i2 => s_T1_out, i3 => (others => '0'),  -- "i3" is unused
         s0 => c_mux_mem_addr_A, s1 => c_mux_mem_addr_B, O => s_mem_addr
     );
     
@@ -160,7 +160,7 @@ begin
 
     temp_higher_9_bits <= s_instruction_register(8 downto 0) & ("0000000");
     l_mux_rf_d3: mux_n_bit_4_to_1 generic map (n => 16) port map (
-        i0 => temp_higher_9_bits, i1 => s_T3_out, i2 => s_PC_out, i3 => (others => 'X'),
+        i0 => temp_higher_9_bits, i1 => s_T3_out, i2 => s_PC_out, i3 => (others => '0'),  -- "i3" is unused
         s0 => c_mux_rf_d3_A, s1 => c_mux_rf_d3_B, O => s_rf_d3
     );
 
@@ -224,7 +224,7 @@ begin
     );
 
     l_mux_ALU_A: mux_n_bit_4_to_1 generic map (n => 16) port map (
-        i0 => s_PC_out, i1 => s_T1_out, i2 => s_T2_out, i3 => (others => 'X'),
+        i0 => s_PC_out, i1 => s_T1_out, i2 => s_T2_out, i3 => (others => '0'),  -- "i3" is unused
         s0 => c_mux_alu_a_A, s1 => c_mux_alu_a_B,
         O => s_alu_a_in
     );
@@ -261,7 +261,7 @@ begin
     );
 
     l_mux_t3: mux_n_bit_4_to_1 generic map (n => 16) port map (
-        i0 => s_mem_out, i1 => s_alu_C, i2 => s_rf_D1_out, i3 => (others => 'X'),
+        i0 => s_mem_out, i1 => s_alu_C, i2 => s_rf_D1_out, i3 => (others => '0'),  -- "i3" is unused
         s0 => c_mux_t3_A, s1 => c_mux_t3_B, O => s_T3_in
     );
 
