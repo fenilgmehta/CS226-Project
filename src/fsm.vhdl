@@ -3,15 +3,16 @@ USE ieee.std_logic_1164.ALL;
 
 ENTITY FSM IS
     PORT (
-        instruction, T1, T2, T3 : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+        instruction, mem_instruction, T1, T2, T3 : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
         clock, reset, init_carry, init_zero : IN STD_LOGIC;
 
         pc_w, m_w, ir_w, rf_w, t3_w, t2_w, t1_w,  -- Program Counter write, Memory Write, Instruction Register Write, Register File Write, Register T1 & T2 & T3 Write
         mux_pc, mux_mem_addr_A, mux_mem_addr_B, mux_mem_in, mux_rf_d3_A, mux_rf_d3_B, mux_rf_a1, mux_rf_a3_A,
         mux_rf_a3_B, mux_t1, mux_t2_A, mux_t2_B, mux_alu_a_A, mux_alu_a_B, mux_alu_b_A, mux_alu_b_B, mux_t3_A, mux_t3_B,
         alu_operation : OUT STD_LOGIC;
-        flag_alu_cz_update: OUT STD_LOGIC;  -- used for state S2
-        flag_mem_z_update: OUT STD_LOGIC  -- used for state S8
+        carry_flag: OUT STD_LOGIC;  -- used for state S2
+        zero_flag: OUT STD_LOGIC;  -- used for state S8
+        mux_zero: OUT STD_LOGIC  -- used to differentiate S2 and S8
     );
 END ENTITY;
 
@@ -32,7 +33,7 @@ BEGIN
                  mux_t2_A_var, mux_t2_B_var, mux_alu_a_A_var, mux_alu_a_B_var, mux_alu_b_A_var,
                  mux_alu_b_B_var, mux_t3_A_var, mux_t3_B_var : STD_LOGIC;
 
-        VARIABLE flag_alu_cz_update_var, flag_mem_z_update_var : STD_LOGIC;
+        VARIABLE mux_zero_var, zero_var_flag, carry_var_flag : STD_LOGIC;
 
     BEGIN
         nextState_var := fsm_state_symbol;
@@ -63,8 +64,8 @@ BEGIN
         mux_t3_A_var := '0';
         mux_t3_B_var := '0';
 
-        flag_alu_cz_update_var := '0';
-        flag_mem_z_update_var := '0';
+        zero_var_flag := '0';
+        carry_var_flag := '0';
 
         CASE fsm_state_symbol IS
             WHEN s0 =>
@@ -73,13 +74,13 @@ BEGIN
                 mux_mem_addr_A_var := '0';
                 mux_mem_addr_B_var := '1';
 
-                IF (mem(15 DOWNTO 12) = "0001") THEN --t1
+                IF (mem_instruction(15 DOWNTO 12) = "0001") THEN --t1
                     nextState_var := s5;
-                ELSIF (mem(15 DOWNTO 12) = "0011") THEN --t2
+                ELSIF (mem_instruction(15 DOWNTO 12) = "0011") THEN --t2
                     nextState_var := s11;
-                ELSIF ((mem(15 DOWNTO 12) = "0110") OR (mem(15 DOWNTO 12) = "0111")) THEN --t3
+                ELSIF ((mem_instruction(15 DOWNTO 12) = "0110") OR (mem_instruction(15 DOWNTO 12) = "0111")) THEN --t3
                     nextState_var := s13;
-                ELSIF ((mem(15 DOWNTO 12) = "1000") OR (mem(15 DOWNTO 12) = "1001")) THEN
+                ELSIF ((mem_instruction(15 DOWNTO 12) = "1000") OR (mem_instruction(15 DOWNTO 12) = "1001")) THEN
                     nextState_var := s18;
                 ELSE
                     nextState_var := s1;
@@ -93,7 +94,6 @@ BEGIN
                 mux_t1_var := '1';
                 mux_t2_A_var := '0';
                 mux_t2_B_var := '1';
-
 
                 IF ((instruction(15 DOWNTO 12) = "0100") OR (instruction(15 DOWNTO 12) = "0101")) THEN --t8
                     nextState_var := s7;
@@ -117,11 +117,14 @@ BEGIN
 
                 IF (instruction(15 DOWNTO 12) = "0010") THEN
                     alu_var := '1';
+                    carry_var_flag := '0';  -- do NOT update carry register
                 ELSE
                     alu_var := '0';
+                    carry_var_flag := '1';  -- update carry register
                 END IF;
 
-                flag_alu_cz_update_var := '1';
+                mux_zero_var := '0';  -- denotes state S2
+                zero_var_flag := '1';  -- update zero register
 
                 IF ((instruction(15 DOWNTO 12) = "0000") OR (instruction(15 DOWNTO 12) = "0010")) THEN --t11
                     nextState_var := s3;
@@ -198,7 +201,9 @@ BEGIN
                 mux_t3_A_var := '0';
                 mux_t3_B_var := '0';
 
-                flag_mem_z_update_var := '1';
+                mux_zero_var := '1';  -- denotes state S8
+                zero_var_flag := '1';  -- update zero flag
+                carry_var_flag := '0';  -- no NOT update carry register
 
                 nextState_var := s9;
 
@@ -404,8 +409,9 @@ BEGIN
         mux_t3_A <= mux_t3_A_var;
         mux_t3_B <= mux_t3_B_var;
 
-        flag_alu_cz_update <= flag_alu_cz_update_var;
-        flag_mem_z_update <= flag_mem_z_update_var;
+        carry_flag <= carry_var_flag;
+        zero_flag <= zero_var_flag;
+        mux_zero <= mux_zero_var;
 
         IF (rising_edge(clock)) THEN
             IF (reset = '1') THEN
