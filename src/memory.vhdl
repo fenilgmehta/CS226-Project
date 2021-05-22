@@ -43,12 +43,12 @@ ARCHITECTURE SimulatedRAMArch OF SimulatedRAM IS
 
 BEGIN
     mem_data_out <= SimulatedRAMStorage(conv_integer(addr));
-    mem_write : PROCESS (mem_wr, mem_data_in, addr, clk)
+    l_mem_write : PROCESS (addr, mem_data_in, clock, mem_write)
     BEGIN
-        IF (mem_wr = '1') THEN
-            IF (rising_edge(clk)) THEN
+        IF (mem_write = '1') THEN
+            IF (rising_edge(clock)) THEN
                 SimulatedRAMStorage(conv_integer(addr)) <= mem_data_in;
             END IF;
         END IF;
     END PROCESS;
-END MemoryArch;
+END SimulatedRAMArch;
