@@ -18,8 +18,8 @@ entity generic_adder is
 end generic_adder; 
 
 architecture generic_adder_arch of generic_adder is
+    -- Storing result in n bit and will use the n'th bit as carry
     signal temp_n_bit_result : std_logic_vector(n downto 0);
-    -- Storing result in n bit and will use the nth bit as carry
 begin
     temp_n_bit_result <= ('0' & input_a) + ('0' & input_b);
     output_sum <= temp_n_bit_result(n-1 downto 0);

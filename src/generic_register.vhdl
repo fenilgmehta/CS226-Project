@@ -22,7 +22,7 @@ begin
 
     process(input_reg, clock, load_reg)
     begin
-        if (clock'event and clock = '1') then  -- positive edge trigger ---> rising_edge(clock)
+        if (rising_edge(clock)) then  -- positive edge triggered
             if load_reg = '1' then
                 output_reg_temp <= input_reg;
             end if;
