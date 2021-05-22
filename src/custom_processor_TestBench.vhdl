@@ -26,6 +26,8 @@ BEGIN
     processor : CustomProcessor PORT MAP(in_clock => clock, in_reset => reset, dataX => dataX);
 
     PROCESS BEGIN
+        reset <= '1';
+        WAIT FOR 1 ms;
         reset <= '0';
         FOR ii IN 0 TO 100 LOOP
             clock <= '0';
