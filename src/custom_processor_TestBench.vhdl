@@ -19,13 +19,14 @@ ARCHITECTURE test OF CustomProcessor_tb IS
         );
     END COMPONENT;
 
-    SIGNAL clock, reset : STD_ULOGIC;
+    SIGNAL clock, reset : STD_LOGIC;
     SIGNAL dataX : STD_LOGIC_VECTOR(15 DOWNTO 0);
 
 BEGIN
     processor : CustomProcessor PORT MAP(in_clock => clock, in_reset => reset, dataX => dataX);
 
     PROCESS BEGIN
+        clock <= '0';
         reset <= '1';
         WAIT FOR 1 ms;
         reset <= '0';

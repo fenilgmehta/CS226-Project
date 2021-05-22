@@ -16,7 +16,7 @@ end generic_register;
 
 architecture generic_register_arch of generic_register is
 
-    signal output_reg_temp: std_logic_vector(n-1 downto 0);
+    signal output_reg_temp: std_logic_vector(n-1 downto 0) := (others => '0');
 
 begin
 

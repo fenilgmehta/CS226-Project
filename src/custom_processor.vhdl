@@ -95,21 +95,23 @@ architecture CustomProcessorArchitecture of CustomProcessor is
     -- Below are the variables for processor/state Control Signals
     -- Initializing "c_ir_w" ensures that the IR is updated when the processors first starts
     signal c_pc_w, c_m_w, c_ir_w, c_rf_w, c_t3_w, c_t2_w, c_t1_w, c_mux_pc,
-            c_mux_mem_addr_A, c_mux_mem_addr_B, c_mux_mem_in, c_mux_rf_d3_A,
+            c_mux_mem_addr_A, c_mux_mem_in, c_mux_rf_d3_A,
             c_mux_rf_d3_B, c_mux_rf_a1, c_mux_rf_a3_A, c_mux_rf_a3_B, c_mux_t1,
-            c_mux_t2_A, c_mux_t2_B, c_mux_alu_a_A, c_mux_alu_a_B, c_mux_alu_b_A,c_mux_alu_b_B, c_mux_t3_A, c_mux_t3_B : STD_LOGIC;
-    signal c_alu_operation, c_zero_write, c_carry_write, c_mux_zero : STD_LOGIC;
+            c_mux_t2_A, c_mux_t2_B, c_mux_alu_a_A, c_mux_alu_a_B, c_mux_alu_b_A,c_mux_alu_b_B, c_mux_t3_A, c_mux_t3_B : STD_LOGIC := '0';
+    signal c_mux_mem_addr_B : STD_LOGIC := '1';
+    signal c_alu_operation : STD_LOGIC := '0';
+    signal c_zero_write, c_carry_write, c_mux_zero : STD_LOGIC := '0';
 
     -- Prefix "s" denotes signals/temporary variables
     -- Initializing "s_mem_addr" ensures that the processor starts reading from memory address zero
-    signal s_instruction_register : std_logic_vector(15 downto 0);
-    signal s_alu_C, s_PC_in, s_PC_out, s_mem_addr, s_mem_in, s_mem_out, s_rf_d3 : std_logic_vector(15 downto 0);
-    signal s_rf_a1, s_rf_a3 : std_logic_vector(2 downto 0);
-    signal s_rf_D1_out, s_rf_D2_out, s_T1_in, s_T2_in, s_T1_out, s_T2_out, s_alu_a_in, s_alu_b_in, s_T3_in, s_T3_out : std_logic_vector(15 downto 0);
-    signal s_carry_out, s_zero_in, s_zero_out : std_logic_vector(0 downto 0);
+    signal s_instruction_register : std_logic_vector(15 downto 0) := (others => '0');
+    signal s_alu_C, s_PC_in, s_PC_out, s_mem_addr, s_mem_in, s_mem_out, s_rf_d3 : std_logic_vector(15 downto 0) := (others => '0');
+    signal s_rf_a1, s_rf_a3 : std_logic_vector(2 downto 0) := (others => '0');
+    signal s_rf_D1_out, s_rf_D2_out, s_T1_in, s_T2_in, s_T1_out, s_T2_out, s_alu_a_in, s_alu_b_in, s_T3_in, s_T3_out : std_logic_vector(15 downto 0) := (others => '0');
+    signal s_carry_out, s_zero_in, s_zero_out : std_logic_vector(0 downto 0) := (others => '0');
 
-    signal temp_sign_extender_6, temp_sign_extender_9, temp_higher_9_bits : std_logic_vector(15 downto 0);
-    signal temp_carry, temp_zero, temp_t3_isZero : std_logic_vector(0 downto 0);
+    signal temp_sign_extender_6, temp_sign_extender_9, temp_higher_9_bits : std_logic_vector(15 downto 0) := (others => '0');
+    signal temp_carry, temp_zero, temp_t3_isZero : std_logic_vector(0 downto 0) := (others => '0');
 
 begin
 

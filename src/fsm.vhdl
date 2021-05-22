@@ -44,6 +44,7 @@ BEGIN
         t3_w_var := '0';
         t2_w_var := '0';
         t1_w_var := '0';
+        -- alu_var := '0';
 
         mux_pc_var := '0';
         mux_mem_addr_A_var := '0';
