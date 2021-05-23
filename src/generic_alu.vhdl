@@ -20,20 +20,12 @@ end alu;
 
 architecture alu_arch of alu is
 
-    signal temp_result_sum :  std_logic_vector(n-1 downto 0) := (others => '0');
-    signal temp_result_nand : std_logic_vector(n-1 downto 0) := (others => '0');
-    signal temp_c : std_logic := '0';
-    signal temp_z : std_logic := '0';
-
     signal temp_output_alu : std_logic_vector(n-1 downto 0) := (others => '0');
     signal temp_for_carry : std_logic_vector(n downto 0) := (others => '0');
 
 begin
-
-    -- temp_c <= '0';
-    -- temp_z <= '0';
  
-    process (operation, in_a, in_b, temp_result_sum, temp_result_nand)
+    process (operation, in_a, in_b)
     begin
  
         case operation is
@@ -44,15 +36,17 @@ begin
             when others =>
                 temp_output_alu <= (others => 'Z');  -- Z denotes high impedance
         end case;
-    
-        if (temp_output_alu = 0) then
-            z_out <= '0';
-        end if;
 
     end process;
 
     temp_for_carry <= ('0' & in_a) + ('0' & in_b);
     c_out <= temp_for_carry(n);
+    z_out <= (not (
+        temp_output_alu(0) or temp_output_alu(1) or temp_output_alu(2) or temp_output_alu(3) or 
+        temp_output_alu(4) or temp_output_alu(5) or temp_output_alu(6) or temp_output_alu(7) or 
+        temp_output_alu(8) or temp_output_alu(9) or temp_output_alu(10) or temp_output_alu(11) or 
+        temp_output_alu(12) or temp_output_alu(13) or temp_output_alu(14) or temp_output_alu(15)
+    ));
     output_alu <= temp_output_alu;
 
 end alu_arch;

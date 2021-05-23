@@ -22,9 +22,9 @@ END ENTITY;
 
 ARCHITECTURE SimulatedRAMArch OF SimulatedRAM IS
 
-    TYPE regarray IS ARRAY(127 DOWNTO 0) OF STD_LOGIC_VECTOR(15 DOWNTO 0); -- defining a new type
+    TYPE regarray IS ARRAY(65535 DOWNTO 0) OF STD_LOGIC_VECTOR(15 DOWNTO 0); -- defining a new type
     SIGNAL SimulatedRAMStorage : regarray := (
-        0 => x"3100",
+        0 => x"3100",  -- 3100, 0050, 5040
         1 => x"3300",
         2 => x"0050",
         3 => x"0052",

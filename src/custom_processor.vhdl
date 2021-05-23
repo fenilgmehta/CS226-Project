@@ -80,6 +80,8 @@ architecture CustomProcessorArchitecture of CustomProcessor is
             instruction, mem_instruction, T1, T2, T3 : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
             clock, reset, init_carry, init_zero : IN STD_LOGIC;
     
+            old_pc_w, old_m_w, old_ir_w, old_rf_w, old_t3_w, old_t2_w, old_t1_w, old_mux_pc, old_mux_mem_addr_A, old_mux_mem_addr_B, old_mux_mem_in, old_mux_rf_d3_A, old_mux_rf_d3_B, old_mux_rf_a1, old_mux_rf_a3_A, old_mux_rf_a3_B, old_mux_t1, old_mux_t2_A, old_mux_t2_B, old_mux_alu_a_A, old_mux_alu_a_B, old_mux_alu_b_A, old_mux_alu_b_B, old_mux_t3_A, old_mux_t3_B, old_alu_operation, old_carry_flag, old_zero_flag, old_mux_zero: IN STD_LOGIC;
+    
             pc_w, m_w, ir_w, rf_w, t3_w, t2_w, t1_w,  -- Program Counter write, Memory Write, Instruction Register Write, Register File Write, Register T1 & T2 & T3 Write
             mux_pc, mux_mem_addr_A, mux_mem_addr_B, mux_mem_in, mux_rf_d3_A, mux_rf_d3_B, mux_rf_a1, mux_rf_a3_A,
             mux_rf_a3_B, mux_t1, mux_t2_A, mux_t2_B, mux_alu_a_A, mux_alu_a_B, mux_alu_b_A, mux_alu_b_B, mux_t3_A, mux_t3_B,
@@ -104,14 +106,14 @@ architecture CustomProcessorArchitecture of CustomProcessor is
 
     -- Prefix "s" denotes signals/temporary variables
     -- Initializing "s_mem_addr" ensures that the processor starts reading from memory address zero
-    signal s_instruction_register : std_logic_vector(15 downto 0) := (others => '0');
-    signal s_alu_C, s_PC_in, s_PC_out, s_mem_addr, s_mem_in, s_mem_out, s_rf_d3 : std_logic_vector(15 downto 0) := (others => '0');
-    signal s_rf_a1, s_rf_a3 : std_logic_vector(2 downto 0) := (others => '0');
-    signal s_rf_D1_out, s_rf_D2_out, s_T1_in, s_T2_in, s_T1_out, s_T2_out, s_alu_a_in, s_alu_b_in, s_T3_in, s_T3_out : std_logic_vector(15 downto 0) := (others => '0');
-    signal s_carry_out, s_zero_in, s_zero_out : std_logic_vector(0 downto 0) := (others => '0');
+    signal s_instruction_register : std_logic_vector(15 downto 0) := ("0000000000000000");
+    signal s_alu_C, s_PC_in, s_PC_out, s_mem_addr, s_mem_in, s_mem_out, s_rf_d3 : std_logic_vector(15 downto 0) := ("0000000000000000");
+    signal s_rf_a1, s_rf_a3 : std_logic_vector(2 downto 0) := ("000");
+    signal s_rf_D1_out, s_rf_D2_out, s_T1_in, s_T2_in, s_T1_out, s_T2_out, s_alu_a_in, s_alu_b_in, s_T3_in, s_T3_out : std_logic_vector(15 downto 0) := ("0000000000000000");
+    signal s_carry_out, s_zero_in, s_zero_out : std_logic_vector(0 downto 0) := ("0");
 
-    signal temp_sign_extender_6, temp_sign_extender_9, temp_higher_9_bits : std_logic_vector(15 downto 0) := (others => '0');
-    signal temp_carry, temp_zero, temp_t3_isZero : std_logic_vector(0 downto 0) := (others => '0');
+    signal temp_sign_extender_6, temp_sign_extender_9, temp_higher_9_bits : std_logic_vector(15 downto 0) := ("0000000000000000");
+    signal temp_carry, temp_zero, temp_t3_isZero : std_logic_vector(0 downto 0) := ("0");
 
 begin
 
@@ -120,6 +122,8 @@ begin
     l_fsm: FSM port map (
         instruction => s_instruction_register, mem_instruction => s_mem_out, T1 => s_T1_out, T2 => s_T2_out, T3 => s_T3_out,
         clock => in_clock, reset => in_reset, init_carry => s_carry_out(0), init_zero => s_zero_out(0),
+
+        old_pc_w => c_pc_w, old_m_w => c_m_w, old_ir_w => c_ir_w, old_rf_w => c_rf_w, old_t3_w => c_t3_w, old_t2_w => c_t2_w, old_t1_w => c_t1_w, old_mux_pc => c_mux_pc, old_mux_mem_addr_A => c_mux_mem_addr_A, old_mux_mem_addr_B => c_mux_mem_addr_B, old_mux_mem_in => c_mux_mem_in, old_mux_rf_d3_A => c_mux_rf_d3_A, old_mux_rf_d3_B => c_mux_rf_d3_B, old_mux_rf_a1 => c_mux_rf_a1, old_mux_rf_a3_A => c_mux_rf_a3_A, old_mux_rf_a3_B => c_mux_rf_a3_B, old_mux_t1 => c_mux_t1, old_mux_t2_A => c_mux_t2_A, old_mux_t2_B => c_mux_t2_B, old_mux_alu_a_A => c_mux_alu_a_A, old_mux_alu_a_B => c_mux_alu_a_B, old_mux_alu_b_A => c_mux_alu_b_A, old_mux_alu_b_B => c_mux_alu_b_B, old_mux_t3_A => c_mux_t3_A, old_mux_t3_B => c_mux_t3_B, old_alu_operation => c_alu_operation, old_carry_flag => c_carry_write, old_zero_flag => c_zero_write, old_mux_zero => c_mux_zero,
 
         pc_w => c_pc_w, m_w => c_m_w, ir_w => c_ir_w, rf_w => c_rf_w, t3_w => c_t3_w,
         t2_w => c_t2_w, t1_w => c_t1_w, mux_pc => c_mux_pc, mux_mem_addr_A => c_mux_mem_addr_A, mux_mem_addr_B => c_mux_mem_addr_B,
@@ -142,14 +146,6 @@ begin
     );
     
     l_mux_memory_in: mux_n_bit_2_to_1 generic map (n => 16) port map (i0 => s_T1_out, i1 => s_T3_out, s0 => c_mux_mem_in, O => s_mem_in);
-    
-    -- TODO: think about this
-    process (in_clock)
-    begin
-        if (in_reset = '1') then
-            s_mem_addr <= (others => '0');
-        end if;
-    end process;
 
     l_memory: SimulatedRAM port map (addr => s_mem_addr, mem_data_in => s_mem_in, clock => in_clock, mem_write => c_m_w, mem_data_out => s_mem_out);
 
