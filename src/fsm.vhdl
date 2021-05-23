@@ -6,6 +6,8 @@ ENTITY FSM IS
         instruction, mem_instruction, T1, T2, T3 : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
         clock, reset, init_carry, init_zero : IN STD_LOGIC;
 
+        old_pc_w, old_m_w, old_ir_w, old_rf_w, old_t3_w, old_t2_w, old_t1_w, old_mux_pc, old_mux_mem_addr_A, old_mux_mem_addr_B, old_mux_mem_in, old_mux_rf_d3_A, old_mux_rf_d3_B, old_mux_rf_a1, old_mux_rf_a3_A, old_mux_rf_a3_B, old_mux_t1, old_mux_t2_A, old_mux_t2_B, old_mux_alu_a_A, old_mux_alu_a_B, old_mux_alu_b_A, old_mux_alu_b_B, old_mux_t3_A, old_mux_t3_B, old_alu_operation, old_carry_flag, old_zero_flag, old_mux_zero: IN STD_LOGIC;
+
         pc_w, m_w, ir_w, rf_w, t3_w, t2_w, t1_w,  -- Program Counter write, Memory Write, Instruction Register Write, Register File Write, Register T1 & T2 & T3 Write
         mux_pc, mux_mem_addr_A, mux_mem_addr_B, mux_mem_in, mux_rf_d3_A, mux_rf_d3_B, mux_rf_a1, mux_rf_a3_A,
         mux_rf_a3_B, mux_t1, mux_t2_A, mux_t2_B, mux_alu_a_A, mux_alu_a_B, mux_alu_b_A, mux_alu_b_B, mux_t3_A, mux_t3_B,
@@ -18,7 +20,7 @@ END ENTITY;
 
 ARCHITECTURE FSM_arch OF FSM IS
 
-    TYPE StateSymbol IS (s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, s16, s17, s18, s19, s20, s21, sa);
+    TYPE StateSymbol IS (s0, s0_b, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, s16, s17, s18, s19, s20, s21, sa);
     SIGNAL fsm_state_symbol : StateSymbol;
 
 BEGIN
@@ -26,7 +28,7 @@ BEGIN
         VARIABLE nextState_var : StateSymbol;
         
         VARIABLE pc_w_var, m_w_var, ir_w_var, rf_w_var, t3_w_var, t2_w_var, t1_w_var,
-                 done_var, alu_var : STD_LOGIC;
+                 done_var, alu_operation_var : STD_LOGIC;
 
         VARIABLE mux_pc_var, mux_mem_addr_A_var, mux_mem_addr_B_var, mux_mem_in_var, mux_rf_d3_A_var,
                  mux_rf_d3_B_var, mux_rf_a1_var, mux_rf_a3_A_var, mux_rf_a3_B_var, mux_t1_var,
@@ -44,44 +46,46 @@ BEGIN
         t3_w_var := '0';
         t2_w_var := '0';
         t1_w_var := '0';
-        -- alu_var := '0';
+        -- alu_operation_var := 'X';
 
-        mux_pc_var := '0';
-        mux_mem_addr_A_var := '0';
-        mux_mem_addr_B_var := '0';
-        mux_mem_in_var := '0';
-        mux_rf_d3_A_var := '0';
-        mux_rf_d3_B_var := '0';
-        mux_rf_a1_var := '0';
-        mux_rf_a3_A_var := '0';
-        mux_rf_a3_B_var := '0';
-        mux_t1_var := '0';
-        mux_t2_A_var := '0';
-        mux_t2_B_var := '0';
-        mux_alu_a_A_var := '0';
-        mux_alu_a_B_var := '0';
-        mux_alu_b_A_var := '0';
-        mux_alu_b_B_var := '0';
-        mux_t3_A_var := '0';
-        mux_t3_B_var := '0';
+        mux_pc_var := old_mux_pc;
+        mux_mem_addr_A_var := old_mux_mem_addr_A;  -- '0';
+        mux_mem_addr_B_var := old_mux_mem_addr_B;  -- '1';
+        mux_mem_in_var := old_mux_mem_in;
+
+        mux_rf_d3_A_var := old_mux_rf_d3_A;
+        mux_rf_d3_B_var := old_mux_rf_d3_B;
+        mux_rf_a1_var := old_mux_rf_a1;
+        mux_rf_a3_A_var := old_mux_rf_a3_A;
+        mux_rf_a3_B_var := old_mux_rf_a3_B;
+        mux_t1_var := old_mux_t1;
+        mux_t2_A_var := old_mux_t2_A;
+        mux_t2_B_var := old_mux_t2_B;
+        mux_alu_a_A_var := old_mux_alu_a_A;
+        mux_alu_a_B_var := old_mux_alu_a_B;
+        mux_alu_b_A_var := old_mux_alu_b_A;
+        mux_alu_b_B_var := old_mux_alu_b_B;
+        mux_t3_A_var := old_mux_t3_A;
+        mux_t3_B_var := old_mux_t3_B;
 
         zero_var_flag := '0';
         carry_var_flag := '0';
 
         CASE fsm_state_symbol IS
             WHEN s0 =>
-                ir_w_var := '1';
-
+                ir_w_var := '1'; 
                 mux_mem_addr_A_var := '0';
                 mux_mem_addr_B_var := '1';
+                nextState_var := s0_b;
 
-                IF (mem_instruction(15 DOWNTO 12) = "0001") THEN --t1
+            WHEN s0_b =>
+                IF (instruction(15 DOWNTO 12) = "0001") THEN --t1
                     nextState_var := s5;
-                ELSIF (mem_instruction(15 DOWNTO 12) = "0011") THEN --t2
+                ELSIF (instruction(15 DOWNTO 12) = "0011") THEN --t2
                     nextState_var := s11;
-                ELSIF ((mem_instruction(15 DOWNTO 12) = "0110") OR (mem_instruction(15 DOWNTO 12) = "0111")) THEN --t3
+                ELSIF ((instruction(15 DOWNTO 12) = "0110") OR (instruction(15 DOWNTO 12) = "0111")) THEN --t3
                     nextState_var := s13;
-                ELSIF ((mem_instruction(15 DOWNTO 12) = "1000") OR (mem_instruction(15 DOWNTO 12) = "1001")) THEN
+                ELSIF ((instruction(15 DOWNTO 12) = "1000") OR (instruction(15 DOWNTO 12) = "1001")) THEN --t4
                     nextState_var := s18;
                 ELSE
                     nextState_var := s1;
@@ -117,10 +121,10 @@ BEGIN
                 mux_t3_B_var := '1';
 
                 IF (instruction(15 DOWNTO 12) = "0010") THEN
-                    alu_var := '1';
+                    alu_operation_var := '1';
                     carry_var_flag := '0';  -- do NOT update carry register
                 ELSE
-                    alu_var := '0';
+                    alu_operation_var := '0';
                     carry_var_flag := '1';  -- update carry register
                 END IF;
 
@@ -145,7 +149,7 @@ BEGIN
 
             WHEN s4 =>
                 pc_w_var := '1';
-                alu_var := '0';
+                alu_operation_var := '0';
 
                 mux_alu_a_A_var := '0';
                 mux_alu_a_B_var := '0';
@@ -179,7 +183,7 @@ BEGIN
 
             WHEN s7 =>
                 t2_w_var := '1';
-                alu_var := '0';
+                alu_operation_var := '0';
 
                 mux_alu_a_A_var := '1';
                 mux_alu_a_B_var := '0';
@@ -238,7 +242,7 @@ BEGIN
                 nextState_var := s4;
 
             WHEN s12 =>
-                alu_var := '0';
+                alu_operation_var := '0';
                 t3_w_var := '1';
 
                 mux_alu_a_A_var := '0';
@@ -357,7 +361,7 @@ BEGIN
 
 
             WHEN s19 =>
-                alu_var := '0';
+                alu_operation_var := '0';
                 pc_w_var := '1';
 
                 mux_alu_a_A_var := '0';
@@ -389,8 +393,6 @@ BEGIN
         t2_w <= t2_w_var;
         t1_w <= t1_w_var;
 
-        alu_operation <= alu_var;
-
         mux_pc <= mux_pc_var;
         mux_mem_addr_A <= mux_mem_addr_A_var;
         mux_mem_addr_B <= mux_mem_addr_B_var;
@@ -410,6 +412,7 @@ BEGIN
         mux_t3_A <= mux_t3_A_var;
         mux_t3_B <= mux_t3_B_var;
 
+        alu_operation <= alu_operation_var;
         carry_flag <= carry_var_flag;
         zero_flag <= zero_var_flag;
         mux_zero <= mux_zero_var;

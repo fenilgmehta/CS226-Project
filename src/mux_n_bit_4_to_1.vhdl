@@ -16,7 +16,7 @@ end mux_n_bit_4_to_1;
 architecture mux_n_bit_4_to_1_arch of mux_n_bit_4_to_1 is
     signal S : std_logic_vector(1 downto 0);
 begin
-    S <= s0 & s1;
+    S <= s0 & s1;  -- for debugging
     process(s0, s1, i0, i1, i2, i3)
     begin
         if ((s0 = '0') and (s1 = '0')) then
