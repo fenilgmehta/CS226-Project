@@ -19,6 +19,7 @@
 ```sh
 cd src
 ./run.sh
+# IMPORTANT: do NOT forget to ZOOM OUT in GTKWave to view the actual clock waves and the working
 
 # OR
 
